@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -34,10 +34,51 @@ export default function Landing() {
   const { session, loading } = useAuth();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'geography' | 'referrers'>('overview');
+  const [liveStats, setLiveStats] = useState<{
+    totalClicks: number;
+    uniqueCountries: number;
+    mobileShare: number;
+    series: { date: string; count: number }[];
+  } | null>(null);
+
+  useEffect(() => {
+    fetch('/api/stats/public')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d && d.available) {
+          setLiveStats({
+            totalClicks: d.totalClicks,
+            uniqueCountries: d.uniqueCountries,
+            mobileShare: d.mobileShare,
+            series: d.series ?? [],
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
   };
+
+  const overviewBars = liveStats && liveStats.series.length > 0
+    ? (() => {
+        const max = Math.max(...liveStats.series.map((s) => s.count), 1);
+        return liveStats.series.map((s) => ({
+          day: new Date(s.date).toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 3),
+          h: `${Math.max(8, Math.round((s.count / max) * 100))}%`,
+          count: s.count.toLocaleString(),
+        }));
+      })()
+    : [
+        { day: 'Mon', h: '45%', count: '4.5k' },
+        { day: 'Tue', h: '60%', count: '6.1k' },
+        { day: 'Wed', h: '78%', count: '7.8k' },
+        { day: 'Thu', h: '92%', count: '9.2k' },
+        { day: 'Fri', h: '98%', count: '9.4k' },
+        { day: 'Sat', h: '55%', count: '5.5k' },
+        { day: 'Sun', h: '62%', count: '5.7k' },
+      ];
 
   return (
     <div className="relative overflow-hidden pb-16">
@@ -183,21 +224,27 @@ export default function Landing() {
             <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-slate-800/80 dark:bg-slate-800/50">
               <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Clicks</div>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-slate-900 dark:text-white">48,219</span>
+                <span className="text-2xl font-bold text-slate-900 dark:text-white">
+              {liveStats ? liveStats.totalClicks.toLocaleString() : '48,219'}
+            </span>
                 <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">+24.3%</span>
               </div>
             </div>
             <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-slate-800/80 dark:bg-slate-800/50">
               <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Unique Countries</div>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-slate-900 dark:text-white">114</span>
+                <span className="text-2xl font-bold text-slate-900 dark:text-white">
+              {liveStats ? liveStats.uniqueCountries : 114}
+            </span>
                 <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">+12</span>
               </div>
             </div>
             <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-slate-800/80 dark:bg-slate-800/50">
               <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Mobile Share</div>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-slate-900 dark:text-white">68.4%</span>
+                <span className="text-2xl font-bold text-slate-900 dark:text-white">
+              {liveStats ? `${liveStats.mobileShare}%` : '68.4%'}
+            </span>
                 <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">Desktop 31.6%</span>
               </div>
             </div>
@@ -220,15 +267,7 @@ export default function Landing() {
                 </div>
                 {/* Visual Bar representation */}
                 <div className="flex h-36 items-end justify-between gap-2 pt-4 sm:gap-4">
-                  {[
-                    { day: 'Mon', h: '45%', count: '4.5k' },
-                    { day: 'Tue', h: '60%', count: '6.1k' },
-                    { day: 'Wed', h: '78%', count: '7.8k' },
-                    { day: 'Thu', h: '92%', count: '9.2k' },
-                    { day: 'Fri', h: '98%', count: '9.4k' },
-                    { day: 'Sat', h: '55%', count: '5.5k' },
-                    { day: 'Sun', h: '62%', count: '5.7k' },
-                  ].map((bar) => (
+                  {overviewBars.map((bar) => (
                     <div key={bar.day} className="group relative flex flex-1 flex-col items-center gap-1.5 h-full justify-end">
                       <div className="text-[10px] font-mono text-slate-400 opacity-0 transition group-hover:opacity-100 dark:text-slate-500">
                         {bar.count}
