@@ -67,8 +67,6 @@ export default function Landing() {
   return (
     <div className="relative overflow-hidden pb-16 font-sans text-[14px]">
       {/* Background glow effects - blurred radial gradient */}
-      <div className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-96 w-[60rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.25)_0%,rgba(14,165,233,0.15)_40%,transparent_70%)] blur-3xl dark:bg-[radial-gradient(circle,rgba(99,102,241,0.2)_0%,rgba(34,211,238,0.1)_40%,transparent_70%)]" />
-
       {/* Hero Section */}
       <section className="mx-auto flex max-w-4xl flex-col items-center pt-8 text-center sm:pt-14">
         {/* Modern Pill Badge */}

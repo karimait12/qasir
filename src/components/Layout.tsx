@@ -17,6 +17,8 @@ function useTheme() {
   return { dark, toggle: () => setDark((value) => !value) };
 }
 
+const CONTACT_EMAIL = 'abuse@qasir.link';
+
 export default function Layout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -108,7 +110,7 @@ export default function Layout() {
                     }`
                   }
                 >
-                  Links
+                  My links
                 </NavLink>
               </nav>
             )}
@@ -324,14 +326,32 @@ export default function Layout() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <span className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              No IP logging
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              Zero tracking cookies
-            </span>
+            <a
+              href="https://github.com/karimait12"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+            >
+              GitHub
+            </a>
+            <a
+              href="/privacy"
+              className="text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+            >
+              Privacy
+            </a>
+            <a
+              href="/terms"
+              className="text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+            >
+              Terms
+            </a>
+            <a
+              href={`mailto:${CONTACT_EMAIL}?subject=Report%20abuse`}
+              className="text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+            >
+              Report abuse
+            </a>
             <span className="text-slate-400 dark:text-slate-600">|</span>
             <span className="text-slate-400 dark:text-slate-500">
               Vite &middot; Supabase &middot; Vercel
