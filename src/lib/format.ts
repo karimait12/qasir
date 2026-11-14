@@ -1,5 +1,12 @@
+export function shortBaseUrl(): string {
+  const configured = import.meta.env.VITE_SHORT_BASE_URL as string | undefined;
+  const trimmed = configured ? configured.trim().replace(/\/+$/, '') : '';
+  if (trimmed) return trimmed;
+  return window.location.origin;
+}
+
 export function shortUrl(code: string): string {
-  return `${window.location.origin}/${code}`;
+  return `${shortBaseUrl()}/${code}`;
 }
 
 export function flagEmoji(countryCode: string): string {

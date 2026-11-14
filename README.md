@@ -71,10 +71,13 @@ SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
+VITE_SHORT_BASE_URL=
 ```
 
 - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are server-only (Vercel env).
 - `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are client-side.
+- `VITE_SHORT_BASE_URL` (optional) overrides the base used for displayed/copied
+  short URLs and QR codes; falls back to `window.location.origin` when empty.
 
 ### 3. Install and run
 
