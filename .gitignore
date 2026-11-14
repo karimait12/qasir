@@ -1,0 +1,20 @@
+# Swarm runtime state
+.swarm/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Editor/OS
+.vscode/
+.idea/
+*.log
+.DS_Store
+Thumbs.db
