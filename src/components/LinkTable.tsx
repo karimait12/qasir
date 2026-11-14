@@ -78,7 +78,6 @@ export default function LinkTable({ links, onChanged }: LinkTableProps) {
         </thead>
         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
           {links.map((row) => {
-            const short = shortUrl(row.code);
             return (
               <tr key={row.id} className="align-top">
                 <td className="px-4 py-3">
