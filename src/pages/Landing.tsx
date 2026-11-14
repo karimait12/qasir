@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useOverviewStats } from '../hooks/useOverviewStats';
+import { countryName, flagEmoji } from '../lib/format';
+import { barHeightPercent, deltaPercent, isAllZero, mobileSharePercent, peakClicks, weekdayLabel } from '../lib/overview';
 
 interface FAQItem {
   question: string;
@@ -32,6 +35,7 @@ const faqs: FAQItem[] = [
 
 export default function Landing() {
   const { session, loading } = useAuth();
+  const { data: overview, loading: overviewLoading, error: overviewError } = useOverviewStats();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'geography' | 'referrers'>('overview');
 
@@ -39,30 +43,7 @@ export default function Landing() {
     setOpenFaq(openFaq === index ? null : index);
   };
 
-  // Consistent sample data: Total clicks 1,284 across 7 days
-  const overviewBars = [
-    { day: 'Mon', h: '43%', count: '120' },
-    { day: 'Tue', h: '64%', count: '180' },
-    { day: 'Wed', h: '79%', count: '220' },
-    { day: 'Thu', h: '100%', count: '280' },
-    { day: 'Fri', h: '89%', count: '250' },
-    { day: 'Sat', h: '50%', count: '140' },
-    { day: 'Sun', h: '34%', count: '94' },
-  ];
-
-  const geoItems = [
-    { country: 'United States', flag: '🇺🇸', percent: 42, count: '539 clicks' },
-    { country: 'Germany', flag: '🇩🇪', percent: 18, count: '231 clicks' },
-    { country: 'United Kingdom', flag: '🇬🇧', percent: 14, count: '180 clicks' },
-    { country: 'Japan', flag: '🇯🇵', percent: 9, count: '116 clicks' },
-  ];
-
-  const sourceItems = [
-    { domain: 'twitter.com / X', icon: '🐦', hits: '490', share: '38.2%' },
-    { domain: 'github.com', icon: '🐙', hits: '346', share: '26.9%' },
-    { domain: 'linkedin.com', icon: '💼', hits: '243', share: '18.9%' },
-    { domain: 'Direct / Email / QR', icon: '⚡', hits: '205', share: '16.0%' },
-  ];
+  const topCountry = overview?.countries[0];
 
   return (
     <div className="relative overflow-hidden pb-16 font-sans text-[14px]">
@@ -147,14 +128,9 @@ export default function Landing() {
         )}
       </section>
 
-      {/* Interactive Mock Dashboard / Analytics Preview */}
+      {/* Live Analytics Preview */}
       <section className="mx-auto mt-14 max-w-5xl px-4 sm:px-6">
-        <div className="relative rounded-2xl border border-slate-300/80 bg-white/95 p-3 shadow-2xl shadow-indigo-950/10 backdrop-blur sm:p-5 dark:border-slate-700/80 dark:bg-slate-900/90 dark:shadow-indigo-950/30">
-          {/* Sample data label */}
-          <div className="absolute right-3 top-3 z-10 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-            Sample data
-          </div>
-
+        <div className="relative rounded-2xl border border-slate-200/80 bg-white/95 p-3 shadow-2xl shadow-indigo-950/10 backdrop-blur sm:p-5 dark:border-slate-800/80 dark:bg-slate-900/90 dark:shadow-indigo-950/30">
           {/* Mock Browser Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 sm:pb-4 dark:border-slate-800">
             <div className="flex items-center gap-2">
@@ -162,7 +138,7 @@ export default function Landing() {
               <span className="h-3 w-3 rounded-full bg-amber-500/80" />
               <span className="h-3 w-3 rounded-full bg-emerald-500/80" />
               <span className="ml-2 hidden rounded-md bg-slate-100 px-2 py-0.5 text-xs font-mono text-slate-500 sm:inline-block dark:bg-slate-800 dark:text-slate-400">
-                qasir.link/campaign
+                qasir / overview
               </span>
             </div>
 
@@ -204,102 +180,163 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Quick Stats Grid */}
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 dark:border-slate-700 dark:bg-slate-800/50">
-              <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Clicks</div>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-slate-900 dark:text-white">1,284</span>
-              </div>
-            </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 dark:border-slate-700 dark:bg-slate-800/50">
-              <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Countries</div>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-slate-900 dark:text-white">14</span>
-              </div>
-            </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 dark:border-slate-700 dark:bg-slate-800/50">
-              <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Mobile / Desktop</div>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-slate-900 dark:text-white">62% / 38%</span>
-              </div>
-            </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 dark:border-slate-700 dark:bg-slate-800/50">
-              <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Top country</div>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-slate-900 dark:text-white">🇺🇸 US</span>
-              </div>
-            </div>
-          </div>
+          {overviewError && (
+            <p className="mt-4 text-sm text-red-600 dark:text-red-400">Stats unavailable</p>
+          )}
 
-          {/* Dynamic Mock Visual Area */}
-          <div className="mt-4 rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50/40 to-slate-100/40 p-4 dark:border-slate-700 dark:from-slate-950/40 dark:to-slate-900/40">
-            {activeTab === 'overview' && (
-              <div>
-                <div className="mb-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                  <span>Clicks over last 7 days</span>
-                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">Peak: 280 / day</span>
-                </div>
-                {/* Visual Bar representation */}
-                <div className="flex h-36 items-end justify-between gap-2 pt-4 sm:gap-4">
-                  {overviewBars.map((bar) => (
-                    <div key={bar.day} className="group relative flex flex-1 flex-col items-center gap-1.5 h-full justify-end">
-                      <div className="text-[10px] font-mono text-slate-400 opacity-0 transition group-hover:opacity-100 dark:text-slate-500">
-                        {bar.count}
-                      </div>
-                      <div
-                        style={{ height: bar.h }}
-                        className="w-full max-w-[48px] rounded-t-lg bg-gradient-to-t from-indigo-600 to-sky-400 transition-all duration-300 group-hover:from-indigo-500 group-hover:to-sky-300"
-                      />
-                      <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{bar.day}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+          {overviewLoading && !overview && (
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="h-16 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />
+              ))}
+            </div>
+          )}
 
-            {activeTab === 'geography' && (
-              <div className="space-y-3 py-1">
-                {geoItems.map((item) => (
-                  <div key={item.country} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-medium">
-                      <span className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
-                        <span>{item.flag}</span>
-                        <span>{item.country}</span>
+          {overview && (
+            <>
+              {/* Quick Stats Grid */}
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+                <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-slate-800/80 dark:bg-slate-800/50">
+                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Clicks</div>
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-slate-900 dark:text-white">{overview.totalClicks.toLocaleString()}</span>
+                    {deltaPercent(overview.totalClicks, overview.previousTotalClicks) !== null && (
+                      <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                        +{deltaPercent(overview.totalClicks, overview.previousTotalClicks)}%
                       </span>
-                      <span className="font-mono text-slate-500 dark:text-slate-400">{item.count}</span>
-                    </div>
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-sky-400"
-                        style={{ width: `${item.percent}%` }}
-                      />
-                    </div>
+                    )}
                   </div>
-                ))}
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-slate-800/80 dark:bg-slate-800/50">
+                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Unique Countries</div>
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-slate-900 dark:text-white">{overview.uniqueCountries}</span>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-slate-800/80 dark:bg-slate-800/50">
+                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Mobile Share</div>
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-slate-900 dark:text-white">
+                      {(() => {
+                        const mobileShare = mobileSharePercent(
+                          overview.devices.mobile,
+                          overview.devices.desktop,
+                          overview.devices.tablet,
+                        );
+                        return mobileShare !== null ? `${mobileShare}%` : '-';
+                      })()}
+                    </span>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-slate-800/80 dark:bg-slate-800/50">
+                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Top Country</div>
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-slate-900 dark:text-white">
+                      {topCountry ? `${flagEmoji(topCountry.country)} ${countryName(topCountry.country)}` : '-'}
+                    </span>
+                  </div>
+                </div>
               </div>
-            )}
 
-            {activeTab === 'referrers' && (
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 py-1">
-                {sourceItems.map((source) => (
-                  <div
-                    key={source.domain}
-                    className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-lg">{source.icon}</span>
-                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{source.domain}</span>
+              {/* Dynamic Visual Area */}
+              <div className="mt-4 rounded-xl border border-slate-100 bg-gradient-to-b from-slate-50/40 to-slate-100/40 p-4 dark:border-slate-800 dark:from-slate-950/40 dark:to-slate-900/40">
+                {activeTab === 'overview' && (
+                  <div>
+                    <div className="mb-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                      <span>Clicks over last 7 days</span>
+                      {!isAllZero(overview.daily) && (
+                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                          Peak: {peakClicks(overview.daily)} / day
+                        </span>
+                      )}
                     </div>
-                    <div className="text-right">
-                      <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400">{source.hits}</div>
-                      <div className="text-[10px] text-slate-400">{source.share}</div>
-                    </div>
+                    {isAllZero(overview.daily) ? (
+                      <p className="py-8 text-center text-xs text-slate-400">No clicks yet. Create a link and open it to see stats here.</p>
+                    ) : (
+                      <div className="flex h-36 items-end justify-between gap-2 pt-4 sm:gap-4">
+                        {overview.daily.map((d) => {
+                          const max = Math.max(...overview.daily.map((x) => x.clicks), 1);
+                          return (
+                            <div key={d.day} className="group relative flex flex-1 flex-col items-center gap-1.5 h-full justify-end" title={`${d.clicks}`}>
+                              <div className="text-[10px] font-mono text-slate-400 opacity-0 transition group-hover:opacity-100 dark:text-slate-500">
+                                {d.clicks}
+                              </div>
+                              <div
+                                style={{ height: `${barHeightPercent(d.clicks, max)}%` }}
+                                className="w-full max-w-[48px] rounded-t-lg bg-gradient-to-t from-indigo-600 to-sky-400 transition-all duration-300 group-hover:from-indigo-500 group-hover:to-sky-300"
+                              />
+                              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                                {weekdayLabel(d.day)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                ))}
+                )}
+
+                {activeTab === 'geography' && (
+                  <div className="space-y-3 py-1">
+                    {overview.countries.length === 0 ? (
+                      <p className="py-8 text-center text-xs text-slate-400">No clicks yet. Create a link and open it to see stats here.</p>
+                    ) : (
+                      overview.countries.map((item) => {
+                        const total = overview.countries.reduce((a, b) => a + b.clicks, 0) || 1;
+                        const pct = Math.round((item.clicks / total) * 100);
+                        return (
+                          <div key={item.country} className="space-y-1">
+                            <div className="flex items-center justify-between text-xs font-medium">
+                              <span className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                                <span>{flagEmoji(item.country)}</span>
+                                <span>{countryName(item.country)}</span>
+                              </span>
+                              <span className="font-mono text-slate-500 dark:text-slate-400">{item.clicks}</span>
+                            </div>
+                            <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+                              <div
+                                className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-sky-400"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'referrers' && (
+                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 py-1">
+                    {overview.referrers.length === 0 ? (
+                      <p className="py-8 text-center text-xs text-slate-400 col-span-full">No clicks yet. Create a link and open it to see stats here.</p>
+                    ) : (
+                      overview.referrers.map((source) => (
+                        <div
+                          key={source.host}
+                          className="flex items-center justify-between rounded-lg border border-slate-200/70 bg-white p-3 dark:border-slate-800 dark:bg-slate-900"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-lg">🔗</span>
+                            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                              {source.host === 'Direct' ? 'Direct / Email / QR' : source.host}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400">{source.clicks}</div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          )}
+
+          <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">
+            {session ? 'Your last 7 days' : 'Live totals across all Qasir links'}
+          </p>
         </div>
       </section>
 
