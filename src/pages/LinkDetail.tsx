@@ -368,6 +368,39 @@ export default function LinkDetail() {
         </div>
       </div>
 
+      {/* Secondary KPI Cards */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-800/90 dark:bg-slate-900/90">
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Unique Countries
+          </p>
+          <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums">
+            {formatNumber(stats?.uniqueCountries ?? 0)}
+          </p>
+          <p className="mt-1 text-xs text-slate-400">Distinct origins</p>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-800/90 dark:bg-slate-900/90">
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Mobile Share
+          </p>
+          <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums">
+            {stats?.mobileShare != null ? `${stats.mobileShare}%` : '—'}
+          </p>
+          <p className="mt-1 text-xs text-slate-400">Of human clicks</p>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-800/90 dark:bg-slate-900/90">
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Avg Latency
+          </p>
+          <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums">
+            {stats?.avgLatency != null ? `${stats.avgLatency} ms` : '—'}
+          </p>
+          <p className="mt-1 text-xs text-slate-400">Edge response</p>
+        </div>
+      </div>
+
       {/* Interactive Daily Clicks Chart */}
       <div className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm dark:border-slate-800/90 dark:bg-slate-900/90">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">

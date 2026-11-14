@@ -36,4 +36,7 @@ export interface LinkStats {
   devices: Bucket[];
   browsers: Bucket[];
   referrers: Bucket[];
+  uniqueCountries?: number;
+  mobileShare?: number;
+  avgLatency?: number | null;
 }
