@@ -2,18 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light dark;
+@layer base {
+  :root {
+    color-scheme: light dark;
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    @apply bg-slate-50 text-slate-900 antialiased selection:bg-indigo-500 selection:text-white dark:bg-[#0B0F19] dark:text-slate-100;
+  }
 }
 
-html,
-body,
-#root {
-  min-height: 100%;
+/* Custom background patterns and gradients */
+.bg-grid-pattern {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(100, 116, 139, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(100, 116, 139, 0.07) 1px, transparent 1px);
 }
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  @apply bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+.dark .bg-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+.glass-panel {
+  @apply backdrop-blur-xl bg-white/70 border border-slate-200/80 shadow-sm transition-all dark:bg-slate-900/60 dark:border-slate-800/80 dark:shadow-slate-950/40;
+}
+
+.glass-panel-hover {
+  @apply hover:border-slate-300 dark:hover:border-slate-700/80 hover:shadow-md transition-all duration-200;
+}
+
+/* Subtle glow effects */
+.glow-indigo {
+  position: relative;
+}
+.glow-indigo::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(168, 85, 247, 0.3));
+  border-radius: inherit;
+  z-index: -1;
+  filter: blur(8px);
+  opacity: 0.7;
+}
+
+/* Custom modern scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300/60 rounded-full dark:bg-slate-700/60 hover:bg-slate-400 dark:hover:bg-slate-600;
 }

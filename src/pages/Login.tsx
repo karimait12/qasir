@@ -2,17 +2,38 @@ import { useState, type FormEvent } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
+type AuthMode = 'signin' | 'signup';
+
 export default function Login() {
-  const { session, signInWithEmail, signInWithGitHub } = useAuth();
+  const { session, signInWithEmail, signInWithPassword, signUp, signInWithGitHub } = useAuth();
+  const [mode, setMode] = useState<AuthMode>('signin');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (session) return <Navigate to="/dashboard" replace />;
 
-  async function handleEmailSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handlePasswordSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError(null);
+    setSending(true);
+    try {
+      if (mode === 'signin') {
+        await signInWithPassword(email, password);
+      } else {
+        await signUp(email, password);
+        setSent(true);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Authentication failed');
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function handleMagicLink() {
     setError(null);
     setSending(true);
     try {
@@ -36,9 +57,11 @@ export default function Login() {
 
   return (
     <section className="mx-auto max-w-md py-12">
-      <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">
+        {mode === 'signin' ? 'Sign in' : 'Create an account'}
+      </h1>
       <p className="mt-1 text-sm text-slate-500">
-        Use a magic link or continue with GitHub.
+        Use your email and password, a magic link, or GitHub.
       </p>
 
       <button
@@ -55,31 +78,74 @@ export default function Login() {
         <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
       </div>
 
-      <form onSubmit={handleEmailSubmit} className="space-y-3">
-        <label htmlFor="email" className="block text-sm font-medium">
-          Email
-        </label>
-        <input
-          id="email"
-          type="email"
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="you@example.com"
-          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-        />
+      <form onSubmit={handlePasswordSubmit} className="space-y-3">
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="you@example.com"
+            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="••••••••"
+            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+          />
+        </div>
         <button
           type="submit"
           disabled={sending}
           className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
         >
-          {sending ? 'Sending…' : 'Send magic link'}
+          {sending ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Sign up'}
         </button>
       </form>
 
+      <div className="mt-4 flex items-center justify-between text-sm">
+        <button
+          type="button"
+          onClick={() => {
+            setMode(mode === 'signin' ? 'signup' : 'signin');
+            setError(null);
+            setSent(false);
+          }}
+          className="text-indigo-600 hover:underline dark:text-indigo-400"
+        >
+          {mode === 'signin' ? 'Need an account? Sign up' : 'Already have an account? Sign in'}
+        </button>
+        {mode === 'signin' && email && (
+          <button
+            type="button"
+            onClick={() => void handleMagicLink()}
+            disabled={sending}
+            className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+          >
+            Send magic link instead
+          </button>
+        )}
+      </div>
+
       {sent && (
         <p className="mt-4 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">
-          Check your inbox for the sign-in link.
+          {mode === 'signup'
+            ? 'Check your inbox to confirm your email address.'
+            : 'Check your inbox for the sign-in link.'}
         </p>
       )}
 
