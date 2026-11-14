@@ -84,11 +84,47 @@ function referrerHost(referrer: string | null): string | null {
   }
 }
 
-export default async function handler(req: Request): Promise<Response> {
-  const requestUrl = new URL(req.url);
-  const code = requestUrl.searchParams.get('code') ?? '';
-  if (!CODE_RE.test(code)) return notFoundResponse();
-  if (!SUPABASE_URL || !SERVICE_ROLE_KEY) return notFoundResponse();
+function getHeader(req: any, name: string): string {
+  if (req.headers && typeof req.headers.get === 'function') {
+    return req.headers.get(name) ?? '';
+  }
+  if (req.headers && typeof req.headers === 'object') {
+    const val = req.headers[name.toLowerCase()];
+    if (Array.isArray(val)) return val[0] ?? '';
+    return val ?? '';
+  }
+  return '';
+}
+
+function getQueryCode(req: any): string {
+  if (req.query && typeof req.query.code === 'string') {
+    return req.query.code;
+  }
+  const rawUrl: string = req.url ?? '';
+  try {
+    const parsed = new URL(rawUrl, 'http://localhost');
+    return parsed.searchParams.get('code') ?? '';
+  } catch {
+    return '';
+  }
+}
+
+export default async function handler(req: any, res?: any): Promise<any> {
+  const code = getQueryCode(req);
+  if (!CODE_RE.test(code)) {
+    if (res && typeof res.status === 'function') {
+      res.status(404);
+      return res.send ? res.send('Not found') : res.end('Not found');
+    }
+    return notFoundResponse();
+  }
+  if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
+    if (res && typeof res.status === 'function') {
+      res.status(404);
+      return res.send ? res.send('Not found') : res.end('Not found');
+    }
+    return notFoundResponse();
+  }
 
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -103,19 +139,41 @@ export default async function handler(req: Request): Promise<Response> {
       .maybeSingle<LinkRow>();
     link = data ?? null;
   } catch {
+    if (res && typeof res.status === 'function') {
+      res.status(404);
+      return res.send ? res.send('Not found') : res.end('Not found');
+    }
     return notFoundResponse();
   }
 
-  if (!link || !link.is_active) return notFoundResponse();
-  if (link.expires_at && Date.parse(link.expires_at) < Date.now()) return notFoundResponse();
-  if (!isHttpUrl(link.target_url)) return notFoundResponse();
+  if (!link || !link.is_active) {
+    if (res && typeof res.status === 'function') {
+      res.status(404);
+      return res.send ? res.send('Not found') : res.end('Not found');
+    }
+    return notFoundResponse();
+  }
+  if (link.expires_at && Date.parse(link.expires_at) < Date.now()) {
+    if (res && typeof res.status === 'function') {
+      res.status(404);
+      return res.send ? res.send('Not found') : res.end('Not found');
+    }
+    return notFoundResponse();
+  }
+  if (!isHttpUrl(link.target_url)) {
+    if (res && typeof res.status === 'function') {
+      res.status(404);
+      return res.send ? res.send('Not found') : res.end('Not found');
+    }
+    return notFoundResponse();
+  }
 
   // Record the click BEFORE redirecting. Failures must not block the redirect.
   try {
-    const userAgent = req.headers.get('user-agent') ?? '';
+    const userAgent = getHeader(req, 'user-agent');
     const { device, browser } = parseUserAgent(userAgent);
-    const country = (req.headers.get('x-vercel-ip-country') || 'XX').slice(0, 2).toUpperCase();
-    const referrer_host = referrerHost(req.headers.get('referer'));
+    const country = (getHeader(req, 'x-vercel-ip-country') || 'XX').slice(0, 2).toUpperCase();
+    const referrer_host = referrerHost(getHeader(req, 'referer'));
     await supabase.from('clicks').insert({
       link_id: link.id,
       country,
@@ -127,6 +185,20 @@ export default async function handler(req: Request): Promise<Response> {
     // Ignore analytics failures; the redirect still proceeds.
   }
 
+  // Handle Node.js response (res.redirect or res.writeHead)
+  if (res && typeof res.redirect === 'function') {
+    res.setHeader('cache-control', 'no-store');
+    return res.redirect(302, link.target_url);
+  }
+  if (res && typeof res.writeHead === 'function') {
+    res.writeHead(302, {
+      location: link.target_url,
+      'cache-control': 'no-store',
+    });
+    return res.end();
+  }
+
+  // Handle Web Standard Response
   return new Response(null, {
     status: 302,
     headers: {
