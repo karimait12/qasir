@@ -49,6 +49,16 @@ export default function Layout() {
     setUserDropdownOpen(false);
     navigate('/');
   }
+
+const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const columns = [
   {
     title: 'learn',
@@ -79,7 +89,11 @@ export default function Layout() {
       <div className="" />
 
       {/* Modern Top Navigation Bar */}
-      <header className="sticky top-0 z-40  transition-colors ">
+      <header className={`fixed top-0 inset-x-0 z-50 ${
+        scrolled
+          ? ' text-black shadow-md backdrop-blur-lg transition-all '
+          : 'bg-transparent text-white'
+      }`}>
         <div className="mx-auto flex h-16 w-full max-w-6xl text-center items-center justify-between px-4 sm:px-6 lg:px-8">
           
           {/* Brand Logo & Badge */}
@@ -103,10 +117,10 @@ export default function Layout() {
                   to="/dashboard"
                   end
                   className={({ isActive }) =>
-                    `rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                    ` px-3 py-1.5 text-sm font-medium transition-colors ${
                       isActive
-                        ? 'bg-slate-100 text-slate-900 dark:bg-slate-800/80 dark:text-white'
-                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/40 dark:hover:text-slate-200'
+                        ? 'bg-slate-100 text-slate-900 underline underline-offset-4'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 '
                     }`
                   }
                 >
