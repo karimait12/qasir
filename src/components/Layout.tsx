@@ -105,6 +105,12 @@ const [scrolled, setScrolled] = useState(false);
             >
              
               <div className="flex items-center gap-2">
+                <img
+                  src="/qasir-logo.svg"
+                  alt=""
+                  aria-hidden="true"
+                  className="h-8 w-8 rounded-xl shadow-sm"
+                />
                 <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
                   Qasir
                 </span>
