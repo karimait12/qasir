@@ -21,6 +21,7 @@ export default function Layout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isDashboard = location.pathname.startsWith('/dashboard');
   const { dark, toggle } = useTheme();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -88,8 +89,8 @@ const [scrolled, setScrolled] = useState(false);
       {/* Background visual ambience glow */}
       <div className="" />
 
-      {/* Modern Top Navigation Bar */}
-      <header className={`fixed top-0 inset-x-0 z-50 ${
+      {!isDashboard && (
+        <header className={`fixed top-0 inset-x-0 z-50 ${
         scrolled
           ? ' text-black shadow-md backdrop-blur-lg transition-all '
           : 'bg-transparent text-white'
@@ -299,46 +300,49 @@ const [scrolled, setScrolled] = useState(false);
           </div>
         )}
       </header>
+      )}
 
       {/* Main Container */}
       <main className="relative z-10 mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <Outlet />
       </main>
 
-  <footer className="relative overflow-hidden bg-gradient-to-b from-[#fbfbfa] to-white">
-      <div className="relative mx-auto max-w-5xl px-6 pt-10 pb-8 font-[Inter,sans-serif]">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
-          {columns.map((col) => (
-            <div key={col.title}>
-              <h4 className="text-sm font-semibold text-neutral-900">{col.title}</h4>
-              <ul className="mt-4 space-y-3">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-[15px] text-neutral-500 transition hover:text-neutral-900"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+      {!isDashboard && (
+        <footer className="relative overflow-hidden bg-gradient-to-b from-[#fbfbfa] to-white">
+          <div className="relative mx-auto max-w-5xl px-6 pt-10 pb-8 font-[Inter,sans-serif]">
+            <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
+              {columns.map((col) => (
+                <div key={col.title}>
+                  <h4 className="text-sm font-semibold text-neutral-900">{col.title}</h4>
+                  <ul className="mt-4 space-y-3">
+                    {col.links.map((link) => (
+                      <li key={link.label}>
+                        <a
+                          href={link.href}
+                          className="text-[15px] text-neutral-500 transition hover:text-neutral-900"
+                        >
+                          {link.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+
+              {/* about column */}
+              <div>
+                <h4 className="text-sm font-semibold text-neutral-900">about</h4>
+                <p className="mt-4 max-w-[240px] text-[15px] leading-relaxed text-neutral-500">
+                  the practical ai newsletter for founders and business leaders, written by hand,
+                  every thursday.
+                </p>
+              </div>
             </div>
-          ))}
 
-          {/* about column */}
-          <div>
-            <h4 className="text-sm font-semibold text-neutral-900">about</h4>
-            <p className="mt-4 max-w-[240px] text-[15px] leading-relaxed text-neutral-500">
-              the practical ai newsletter for founders and business leaders, written by hand,
-              every thursday.
-            </p>
+            <p className="mt-16 text-center text-xs text-neutral-400">© 2026 AI with Remy</p>
           </div>
-        </div>
-
-        <p className="mt-16 text-center text-xs text-neutral-400">© 2026 AI with Remy</p>
-      </div>
-    </footer>
+        </footer>
+      )}
     </div>
   );
 }
