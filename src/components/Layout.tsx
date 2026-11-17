@@ -76,11 +76,11 @@ export default function Layout() {
   return (
     <div className="relative flex min-h-screen flex-col text-slate-900 transition-colors duration-200 dark:text-slate-100">
       {/* Background visual ambience glow */}
-      <div className="pointer-events-none fixed -top-40 left-1/2 -z-10 h-96 w-[700px] -translate-x-1/2 rounded-full bg-gradient-to-tr from-indigo-500/15 via-purple-500/10 to-pink-500/10 blur-3xl dark:from-indigo-600/20 dark:via-purple-600/15 dark:to-pink-600/10" />
+      <div className="" />
 
       {/* Modern Top Navigation Bar */}
       <header className="sticky top-0 z-40  transition-colors ">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 w-full max-w-6xl text-center items-center justify-between px-4 sm:px-6 lg:px-8">
           
           {/* Brand Logo & Badge */}
           <div className="flex items-center gap-6">
@@ -95,10 +95,10 @@ export default function Layout() {
                 </span>
               </div>
             </Link>
-
+ </div>
             {/* Desktop Navigation Links */}
-            {user && (
-              <nav className="hidden items-center gap-1 md:flex">
+               {user && (
+              <nav className="hidden items-center justify-center md:flex">
                 <NavLink
                   to="/dashboard"
                   end
@@ -110,11 +110,12 @@ export default function Layout() {
                     }`
                   }
                 >
-                  My links
+                  links
                 </NavLink>
               </nav>
-            )}
-          </div>
+)
+}
+         
 
           {/* Desktop Right Actions */}
           <div className="hidden items-center gap-3 md:flex">
