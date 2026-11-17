@@ -17,8 +17,6 @@ function useTheme() {
   return { dark, toggle: () => setDark((value) => !value) };
 }
 
-const CONTACT_EMAIL = 'abuse@qasir.link';
-
 export default function Layout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -51,18 +49,37 @@ export default function Layout() {
     setUserDropdownOpen(false);
     navigate('/');
   }
-
+  const columns = [
+  {
+    title: 'learn',
+    links: [
+      { label: 'the ai course', href: '#' },
+      { label: 'archive', href: '#' },
+      { label: 'media', href: '#' },
+      { label: 'perks', href: '#' },
+    ],
+  },
+  {
+    title: 'connect',
+    links: [
+      { label: 'youtube', href: '#' },
+      { label: 'instagram', href: '#' },
+      { label: 'x (twitter)', href: '#' },
+      { label: 'linkedin', href: '#' },
+      { label: 'work with us', href: '#' },
+    ],
+  },
+];
   const userEmail = user?.email ?? 'User';
   const userInitials = userEmail.slice(0, 2).toUpperCase();
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-slate-50 text-slate-900 transition-colors duration-200 dark:bg-[#0B0F19] dark:text-slate-100">
-      {/* Background visual ambience grid & glow */}
-      <div className="pointer-events-none fixed inset-0 z-0 bg-grid-pattern opacity-40 dark:opacity-30" />
+    <div className="relative flex min-h-screen flex-col text-slate-900 transition-colors duration-200 dark:text-slate-100">
+      {/* Background visual ambience glow */}
       <div className="pointer-events-none fixed -top-40 left-1/2 -z-10 h-96 w-[700px] -translate-x-1/2 rounded-full bg-gradient-to-tr from-indigo-500/15 via-purple-500/10 to-pink-500/10 blur-3xl dark:from-indigo-600/20 dark:via-purple-600/15 dark:to-pink-600/10" />
 
       {/* Modern Top Navigation Bar */}
-      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/75 backdrop-blur-md transition-colors dark:border-slate-800/80 dark:bg-[#0B0F19]/80">
+      <header className="sticky top-0 z-40  transition-colors ">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           
           {/* Brand Logo & Badge */}
@@ -71,27 +88,10 @@ export default function Layout() {
               to={user ? '/dashboard' : '/'}
               className="group flex items-center gap-2.5 font-semibold tracking-tight transition"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25 transition-transform duration-200 group-hover:scale-105 group-hover:shadow-indigo-500/35">
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                  />
-                </svg>
-              </div>
+             
               <div className="flex items-center gap-2">
-                <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                  QASIR
-                </span>
-                <span className="hidden rounded-full border border-indigo-200/60 bg-indigo-50/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-indigo-700 dark:border-indigo-500/20 dark:bg-indigo-950/40 dark:text-indigo-300 sm:inline-block">
-                  Privacy-first
+                <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                  Qasir
                 </span>
               </div>
             </Link>
@@ -118,33 +118,7 @@ export default function Layout() {
 
           {/* Desktop Right Actions */}
           <div className="hidden items-center gap-3 md:flex">
-            {/* Theme Toggle Button */}
-            <button
-              type="button"
-              onClick={toggle}
-              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/80 bg-white/60 text-slate-600 shadow-sm transition hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-            >
-              {dark ? (
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-              ) : (
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  />
-                </svg>
-              )}
-            </button>
+          
 
             {user ? (
               /* User Profile Dropdown */
@@ -218,9 +192,9 @@ export default function Layout() {
               <div className="flex items-center gap-2">
                 <Link
                   to="/login"
-                  className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-500/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/35 active:scale-[0.98]"
+                  className="inline-flex items-center justify-center rounded-full bg-[#5b5bff] px-5 py-2 text-sm font-Inter text-white shadow-sm shadow-indigo-800/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/35 active:scale-[0.98]"
                 >
-                  Sign in
+                  Sign Free
                 </Link>
               </div>
             )}
@@ -316,49 +290,40 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      {/* Refined SaaS Footer */}
-      <footer className="relative z-10 border-t border-slate-200/80 bg-white/40 py-8 backdrop-blur-sm transition-colors dark:border-slate-800/80 dark:bg-slate-950/40">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 text-center text-xs text-slate-500 sm:flex-row sm:text-left sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-700 dark:text-slate-300">qasir</span>
-            <span>&bull;</span>
-            <span>Privacy-friendly URL Shortener & Analytics</span>
-          </div>
+  <footer className="relative overflow-hidden bg-gradient-to-b from-[#fbfbfa] to-white">
+      <div className="relative mx-auto max-w-5xl px-6 pt-10 pb-8 font-[Inter,sans-serif]">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
+          {columns.map((col) => (
+            <div key={col.title}>
+              <h4 className="text-sm font-semibold text-neutral-900">{col.title}</h4>
+              <ul className="mt-4 space-y-3">
+                {col.links.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      className="text-[15px] text-neutral-500 transition hover:text-neutral-900"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
 
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="https://github.com/karimait12"
-              target="_blank"
-              rel="noreferrer noopener"
-              className="text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
-            >
-              GitHub
-            </a>
-            <a
-              href="/privacy"
-              className="text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
-            >
-              Privacy
-            </a>
-            <a
-              href="/terms"
-              className="text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
-            >
-              Terms
-            </a>
-            <a
-              href={`mailto:${CONTACT_EMAIL}?subject=Report%20abuse`}
-              className="text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
-            >
-              Report abuse
-            </a>
-            <span className="text-slate-400 dark:text-slate-600">|</span>
-            <span className="text-slate-400 dark:text-slate-500">
-              Vite &middot; Supabase &middot; Vercel
-            </span>
+          {/* about column */}
+          <div>
+            <h4 className="text-sm font-semibold text-neutral-900">about</h4>
+            <p className="mt-4 max-w-[240px] text-[15px] leading-relaxed text-neutral-500">
+              the practical ai newsletter for founders and business leaders, written by hand,
+              every thursday.
+            </p>
           </div>
         </div>
-      </footer>
+
+        <p className="mt-16 text-center text-xs text-neutral-400">© 2026 AI with Remy</p>
+      </div>
+    </footer>
     </div>
   );
 }

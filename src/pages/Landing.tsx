@@ -1,9 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useOverviewStats } from '../hooks/useOverviewStats';
-import { countryName, flagEmoji } from '../lib/format';
-import { barHeightPercent, deltaPercent, isAllZero, mobileSharePercent, peakClicks, weekdayLabel } from '../lib/overview';
 
 interface FAQItem {
   question: string;
@@ -34,35 +31,33 @@ const faqs: FAQItem[] = [
 ];
 
 export default function Landing() {
-  const { session, loading } = useAuth();
-  const { data: overview, loading: overviewLoading, error: overviewError } = useOverviewStats();
+  const { session } = useAuth();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'geography' | 'referrers'>('overview');
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
   };
 
-  const topCountry = overview?.countries[0];
-
   return (
-    <div className="relative overflow-hidden pb-16 font-sans text-[14px]">
+    <div className="relative overflow-hidden bg-transparent pb-16 font-sans text-[14px]">
       {/* Background glow effects - blurred radial gradient */}
       {/* Hero Section */}
-      <section className="mx-auto flex max-w-4xl flex-col items-center pt-8 text-center sm:pt-14">
+      <div>
+      <section className="mx-auto flex max-w-4xl flex-col items-center px-6 pt-8 mt-[35] text-center sm:pt-14">
         {/* Modern Pill Badge */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200/80 bg-indigo-50/80 px-3.5 py-1.5 text-xs font-semibold text-indigo-700 shadow-sm backdrop-blur transition hover:border-indigo-300 dark:border-indigo-900/60 dark:bg-indigo-950/40 dark:text-indigo-300">
-          <span className="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
-          <span>Anonymous Analytics</span>
-        </div>
+
 
         {/* Hero Title */}
-        <h1 className="mt-7 text-4xl font-extrabold leading-[1.1] tracking-tight text-slate-900 sm:text-6xl dark:text-white">
-          Short links with{' '}
-          <span className="bg-gradient-to-r from-indigo-600 via-sky-500 to-indigo-500 bg-clip-text text-transparent dark:from-indigo-400 dark:via-sky-300 dark:to-indigo-300">
-            anonymous
+        <h1 className="hero-title">
+          Short{' '}
+          <span className="highlight">
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            links
           </span>{' '}
-          analytics.
+          with anonymous analytics.
         </h1>
 
         {/* Subtitle */}
@@ -76,7 +71,7 @@ export default function Landing() {
           {session ? (
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:from-indigo-500 hover:to-indigo-600 hover:shadow-indigo-600/35 active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r bg-[#5b5bff] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:from-indigo-500 hover:to-indigo-600 hover:shadow-indigo-600/35 active:scale-[0.98]"
             >
               <span>Go to your Dashboard</span>
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -86,7 +81,7 @@ export default function Landing() {
           ) : (
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:from-indigo-500 hover:to-indigo-600 hover:shadow-indigo-600/35 active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r bg-[--btn] px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:from-indigo-500 hover:to-indigo-600 hover:shadow-indigo-600/35 active:scale-[0.98]"
             >
               <span>Get Started Free</span>
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -95,43 +90,16 @@ export default function Landing() {
             </Link>
           )}
 
-          <a
-            href="#features"
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-6 py-3.5 text-sm font-medium text-slate-700 backdrop-blur transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300 dark:hover:border-slate-700 dark:hover:bg-slate-800"
-          >
-            Explore Features
-          </a>
         </div>
 
-        {/* Trust Badges */}
-        {!loading && (
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400">
-            <span className="inline-flex items-center gap-1.5">
-              <svg className="h-4 w-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              No IP addresses stored
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <svg className="h-4 w-4 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              Fast redirects
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <svg className="h-4 w-4 text-sky-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              Custom aliases & QR codes
-            </span>
-          </div>
-        )}
-      </section>
 
-      {/* Live Analytics Preview */}
+      </section>
+      </div>
+
+      {/* 
       <section className="mx-auto mt-14 max-w-5xl px-4 sm:px-6">
         <div className="relative rounded-2xl border border-slate-200/80 bg-white/95 p-3 shadow-2xl shadow-indigo-950/10 backdrop-blur sm:p-5 dark:border-slate-800/80 dark:bg-slate-900/90 dark:shadow-indigo-950/30">
-          {/* Mock Browser Header */}
+         
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 sm:pb-4 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-rose-500/80" />
@@ -142,7 +110,7 @@ export default function Landing() {
               </span>
             </div>
 
-            {/* Interactive Tab Switcher */}
+            
             <div className="flex rounded-lg bg-slate-100 p-0.5 text-xs font-medium dark:bg-slate-800">
               <button
                 type="button"
@@ -194,7 +162,7 @@ export default function Landing() {
 
           {overview && (
             <>
-              {/* Quick Stats Grid */}
+        
               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
                 <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-slate-800/80 dark:bg-slate-800/50">
                   <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Clicks</div>
@@ -238,7 +206,6 @@ export default function Landing() {
                 </div>
               </div>
 
-              {/* Dynamic Visual Area */}
               <div className="mt-4 rounded-xl border border-slate-100 bg-gradient-to-b from-slate-50/40 to-slate-100/40 p-4 dark:border-slate-800 dark:from-slate-950/40 dark:to-slate-900/40">
                 {activeTab === 'overview' && (
                   <div>
@@ -339,158 +306,116 @@ export default function Landing() {
           </p>
         </div>
       </section>
+       */}
 
-      {/* How it works - 3 steps */}
-      <section id="features" className="mx-auto mt-24 max-w-5xl px-4 sm:px-6">
-        <div className="text-center">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-            How it works
-          </h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+      <div className="mt-9 w-full bg-gradient-to-b from-transparent to-white to-5% pb-8">
+        <section id="features" className="mx-auto mt-24 max-w-[1100px] px-6 text-center">
+      
+          <p className="mb-12 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
             Three steps to smarter links
           </p>
-        </div>
 
-        {/* 3 Steps */}
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
-          <div className="rounded-2xl border border-slate-300/80 bg-white/70 p-6 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-300">
-              <span className="text-lg font-bold">1</span>
-            </div>
-            <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">Paste a link</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Enter any long URL and optionally choose a custom alias.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-300/80 bg-white/70 p-6 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-sky-50 text-sky-600 dark:bg-sky-950/80 dark:text-sky-300">
-              <span className="text-lg font-bold">2</span>
-            </div>
-            <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">Share it</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Copy your short link or download a QR code for print and digital use.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-300/80 bg-white/70 p-6 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/80 dark:text-emerald-300">
-              <span className="text-lg font-bold">3</span>
-            </div>
-            <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">See anonymous stats</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Track clicks, countries, devices, and referrers without storing IP addresses.
-            </p>
-          </div>
-        </div>
-
-        {/* 3 Feature Cards */}
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
-          <div className="group rounded-2xl border border-slate-300/80 bg-white/70 p-6 shadow-sm backdrop-blur transition duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900/60 dark:hover:border-indigo-700">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 transition group-hover:bg-indigo-600 group-hover:text-white dark:bg-indigo-950/80 dark:text-indigo-300">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-              </svg>
-            </div>
-            <h3 className="mt-5 text-base font-semibold text-slate-900 dark:text-white">Custom aliases</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Choose your own short link slug to strengthen brand recall.
-            </p>
-          </div>
-
-          <div className="group rounded-2xl border border-slate-300/80 bg-white/70 p-6 shadow-sm backdrop-blur transition duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900/60 dark:hover:border-indigo-700">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-50 text-sky-600 transition group-hover:bg-sky-500 group-hover:text-white dark:bg-sky-950/80 dark:text-sky-300">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-              </svg>
-            </div>
-            <h3 className="mt-5 text-base font-semibold text-slate-900 dark:text-white">QR codes</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Download QR codes for every link, ready for print and digital use.
-            </p>
-          </div>
-
-          <div className="group rounded-2xl border border-slate-300/80 bg-white/70 p-6 shadow-sm backdrop-blur transition duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900/60 dark:hover:border-indigo-700">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 transition group-hover:bg-emerald-600 group-hover:text-white dark:bg-emerald-950/80 dark:text-emerald-300">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </div>
-            <h3 className="mt-5 text-base font-semibold text-slate-900 dark:text-white">Anonymous analytics</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Track clicks, countries, devices, and referrers. No IP addresses stored, no cookies for visitors.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="mx-auto mt-24 max-w-3xl px-4 sm:px-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
-            Frequently Asked Questions
-          </h2>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            Have questions about analytics or links? Here are the answers.
-          </p>
-        </div>
-
-        <div className="mt-8 space-y-3">
-          {faqs.map((faq, index) => {
-            const isOpen = openFaq === index;
-            return (
-              <div
-                key={faq.question}
-                className="overflow-hidden rounded-xl border border-slate-300/80 bg-white/60 transition dark:border-slate-700 dark:bg-slate-900/60"
-              >
-                <button
-                  type="button"
-                  onClick={() => toggleFaq(index)}
-                  className="flex w-full items-center justify-between px-5 py-4 text-left font-medium text-slate-900 transition hover:bg-slate-50/50 dark:text-white dark:hover:bg-slate-800/40"
-                >
-                  <span className="text-sm font-semibold">{faq.question}</span>
-                  <svg
-                    className={`h-4 w-4 shrink-0 text-slate-500 transition-transform duration-200 ${
-                      isOpen ? 'rotate-180' : ''
-                    }`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {isOpen && (
-                  <div className="border-t border-slate-100 px-5 py-3.5 text-sm leading-relaxed text-slate-600 dark:border-slate-700 dark:text-slate-300">
-                    {faq.answer}
-                  </div>
-                )}
+          {/* 3 Steps */}
+          <div className="grid grid-cols-1 items-start justify-items-center gap-10 md:grid-cols-3 md:gap-8">
+            <div className="flex flex-col items-center text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5b5bff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="preview-icon"><path d="M11 14h10"/><path d="M16 4h2a2 2 0 0 1 2 2v1.344"/><path d="m17 18 4-4-4-4"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
               </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* CTA Box */}
-      <section className="mx-auto mt-20 max-w-4xl px-4 sm:px-6">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-sky-600 px-6 py-12 text-center text-white shadow-xl shadow-indigo-500/20 sm:px-12">
-          {/* Subtle decoration */}
-          <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-indigo-900/30 blur-2xl" />
-
-          <h2 className="text-3xl font-extrabold leading-[1.1] sm:text-4xl">Ready to shorten smarter?</h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-indigo-100 sm:text-base">
-            Start creating short links in less than 30 seconds. No credit card required.
-          </p>
-
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              to={session ? '/dashboard' : '/login'}
-              className="rounded-xl bg-white px-7 py-3 text-sm font-semibold text-indigo-700 shadow-md transition hover:bg-slate-100 active:scale-95"
-            >
-              {session ? 'Go to your Dashboard' : 'Create Free Account'}
-            </Link>
+              <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">Paste a link</h3>
+              <p className="mt-2 max-w-[260px] text-[15px] leading-relaxed text-slate-600 dark:text-slate-400">
+                Enter any long URL and optionally choose a custom alias.
+              </p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5b5bff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-share preview-icon"><path d="M12 2v13"/><path d="m16 6-4-4-4 4"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></svg>
+              </div>
+              <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">Share it</h3>
+              <p className="mt-2 max-w-[260px] text-[15px] leading-relaxed text-slate-600 dark:text-slate-400">
+                Copy your short link or download a QR code for print and digital use.
+              </p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center">
+               <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5b5bff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chart-no-axes-combined preview-icon"><path d="M12 16v5"/><path d="M16 14.639V21"/><path d="M20 10.656V21"/><path d="m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"/><path d="M4 18.463V21"/><path d="M8 14.656V21"/></svg>
+              </div>
+              <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-white">See anonymous stats</h3>
+              <p className="mt-2 max-w-[260px] text-[15px] leading-relaxed text-slate-600 dark:text-slate-400">
+                Track clicks, countries, devices, and referrers without storing IP addresses.
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="mx-auto mt-24 max-w-3xl px-4 sm:px-6">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
+              Frequently Asked Questions
+            </h2>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              Have questions about analytics or links? Here are the answers.
+            </p>
+          </div>
+
+          <div className="mt-8 space-y-3">
+            {faqs.map((faq, index) => {
+              const isOpen = openFaq === index;
+              return (
+                <div
+                  key={faq.question}
+                  className="overflow-hidden rounded-xl border border-slate-300/80 bg-white/60 transition dark:border-slate-700 dark:bg-slate-900/60"
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleFaq(index)}
+                    className="flex w-full items-center justify-between px-5 py-4 text-left font-medium text-slate-900 transition hover:bg-slate-50/50 dark:text-white dark:hover:bg-slate-800/40"
+                  >
+                    <span className="text-sm font-semibold">{faq.question}</span>
+                    <svg
+                      className={`h-4 w-4 shrink-0 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
+                        }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {isOpen && (
+                    <div className="border-t border-slate-100 px-5 py-3.5 text-sm leading-relaxed text-slate-600 dark:border-slate-700 dark:text-slate-300">
+                      {faq.answer}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* CTA Box */}
+        <section className="mx-auto mt-20 max-w-4xl px-4 sm:px-6">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-sky-600 px-6 py-12 text-center text-white shadow-xl shadow-indigo-500/20 sm:px-12">
+            {/* Subtle decoration */}
+            <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
+            <div className="pointer-events-none absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-indigo-900/30 blur-2xl" />
+
+            <h2 className="text-3xl font-extrabold leading-[1.1] sm:text-4xl">Ready to shorten smarter?</h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm text-indigo-100 sm:text-base">
+              Start creating short links in less than 30 seconds. No credit card required.
+            </p>
+
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link
+                to={session ? '/dashboard' : '/login'}
+                className="rounded-xl bg-white px-7 py-3 text-sm font-semibold text-indigo-700 shadow-md transition hover:bg-slate-100 active:scale-95"
+              >
+                {session ? 'Go to your Dashboard' : 'Create Free Account'}
+              </Link>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

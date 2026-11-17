@@ -14,9 +14,9 @@ export default function App() {
       <AuthProvider>
         <ToastProvider>
           <Routes>
+            <Route path="/login" element={<Login />} />
             <Route element={<Layout />}>
               <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<Login />} />
               <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/dashboard/:id" element={<LinkDetail />} />
